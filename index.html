@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billet Euro - Chiffre de contrôle</title>
+</head>
+<body style="font-family:Arial,sans-serif;background:#f0f0f0;padding:20px;margin:0;">
+
+<div style="background:white;border-radius:12px;padding:24px;max-width:480px;margin:0 auto;">
+  <h1 style="font-size:20px;margin:0 0 8px;color:#1a1a1a;">Chiffre de contr&#244;le &#8212; Billet Euro</h1>
+  <p style="font-size:14px;color:#555;margin:0 0 20px;line-height:1.5;">Saisissez le num&#233;ro de s&#233;rie <strong>sans le dernier chiffre</strong> puis appuyez sur le bouton.</p>
+
+  <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:6px;color:#333;">Num&#233;ro de s&#233;rie :</label>
+  <input id="s" type="text" placeholder="ex: UE90049331" maxlength="20"
+    style="display:block;width:100%;padding:12px;font-size:22px;font-family:monospace;letter-spacing:4px;border:2px solid #ccc;border-radius:8px;margin-bottom:14px;text-transform:uppercase;background:#fff;color:#000;-webkit-appearance:none;box-sizing:border-box;"
+    autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+
+  <input type="button" value="Trouver le dernier chiffre" onclick="go()"
+    style="display:block;width:100%;padding:14px;font-size:17px;font-weight:bold;background:#1a6b3c;color:white;border:none;border-radius:8px;cursor:pointer;margin-bottom:20px;-webkit-appearance:none;box-sizing:border-box;" />
+
+  <div id="r" style="display:none;">
+    <div id="num" style="background:#e8f5ee;border:2px solid #1a6b3c;border-radius:8px;padding:16px;margin-bottom:16px;text-align:center;font-family:monospace;font-size:26px;font-weight:bold;letter-spacing:4px;color:#1a1a1a;word-break:break-all;"></div>
+    <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:8px;padding:14px;">
+      <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:10px;">D&#233;tail :</div>
+      <div id="d" style="font-size:13px;color:#555;font-family:monospace;line-height:2;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function go() {
+  var v = document.getElementById('s').value.toUpperCase();
+  var L=[], C=[], i, c, code;
+  for(i=0;i<v.length;i++){
+    c=v.charAt(i); code=c.charCodeAt(0);
+    if(code>=65&&code<=90) L.push(c);
+    else if(code>=48&&code<=57) C.push(parseInt(c));
+  }
+  if(C.length<1){ alert('Entrez un num\u00e9ro valide'); return; }
+
+  var sl=0, dl='';
+  for(i=0;i<L.length;i++){ sl+=L[i].charCodeAt(0)-64; if(i>0)dl+=', '; dl+=L[i]+'='+(L[i].charCodeAt(0)-64); }
+  var nb=L.length, tl=sl+nb, tr=tl;
+  while(tr>=10){ var x=0,s=''+tr; for(i=0;i<s.length;i++) x+=parseInt(s.charAt(i)); tr=x; }
+
+  var sc=0, dc='';
+  for(i=0;i<C.length;i++){ sc+=C[i]; if(i>0)dc+='+'; dc+=C[i]; }
+
+  var tot=tr+sc, mul=Math.floor(tot/9)*9+9, der=mul-tot;
+
+  var red='';
+  if(tl>=10){ var sx=''+tl,pp=''; for(i=0;i<sx.length;i++){if(i>0)pp+='+';pp+=sx.charAt(i);} red=' = '+pp+' = '+tr; }
+
+  document.getElementById('d').innerHTML=
+    '1. Lettres : '+(dl||'aucune')+' =&gt; '+sl+'+'+nb+'='+tl+red+'<br>'+
+    '2. Chiffres : '+dc+' = <b>'+sc+'</b><br>'+
+    '3. Total : '+tr+'+'+sc+' = <b>'+tot+'</b><br>'+
+    '4. Multiple de 9 sup. : <b>'+mul+'</b><br>'+
+    '5. R\u00e9sultat : '+mul+'-'+tot+' = <b style="color:#1a6b3c;font-size:16px;">'+der+'</b>';
+
+  document.getElementById('num').innerHTML=v+'<span style="color:#1a6b3c;text-decoration:underline;">'+der+'</span>';
+  document.getElementById('r').style.display='block';
+}
+</script>
+</body>
+</html>
